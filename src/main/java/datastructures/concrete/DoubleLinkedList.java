@@ -1,5 +1,6 @@
 package datastructures.concrete;
 
+import datastructures.concrete.DoubleLinkedList.Node;
 import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
 
@@ -23,12 +24,32 @@ public class DoubleLinkedList<T> implements IList<T> {
         this.back = null;
         this.size = 0;
     }
-
+    
+    /**
+     * @modifies    this
+     * @effect      add item to the end of list
+     */
     @Override
     public void add(T item) {
-        throw new NotYetImplementedException();
+        if (front == null) {
+            
+        } else {
+            Node<T> cur = front;
+            while(cur.next != null) {
+                cur = cur.next;
+            }
+            cur.next = new Node<T>(cur, item, null);
+            back = cur.next;
+        }
+        size++;
     }
-
+    
+    /**
+     * @requires    this != empty
+     * @modifies    this
+     * @effect      remove the list element in the list
+     * @return      the listnode that is removed
+     */
     @Override
     public T remove() {
         throw new NotYetImplementedException();
@@ -58,10 +79,13 @@ public class DoubleLinkedList<T> implements IList<T> {
     public int indexOf(T item) {
         throw new NotYetImplementedException();
     }
-
+    
+    /**
+     * @return  size of the list
+     */
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return size;
     }
 
     @Override

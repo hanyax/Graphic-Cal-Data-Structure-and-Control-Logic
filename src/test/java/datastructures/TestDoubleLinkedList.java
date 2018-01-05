@@ -63,6 +63,12 @@ public class TestDoubleLinkedList extends BaseTest {
      * finish in milliseconds. If one of your tests is timing out, you're almost
      * certainly doing something wrong.
      */
+    
+    @Test(timeout=SECOND)
+    public void testDelete() {
+        IList<String> list = makeBasicList();
+        
+    }
 
     @Test(timeout=SECOND)
     public void testAddAndGetBasic() {
