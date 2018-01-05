@@ -2,6 +2,7 @@ package datastructures.concrete;
 
 import datastructures.concrete.DoubleLinkedList.Node;
 import datastructures.interfaces.IList;
+import misc.exceptions.EmptyContainerException;
 import misc.exceptions.NotYetImplementedException;
 
 import java.util.Iterator;
@@ -32,7 +33,8 @@ public class DoubleLinkedList<T> implements IList<T> {
     @Override
     public void add(T item) {
         if (front == null) {
-            
+            front = new Node<T>(null, item, null);
+            back = front;
         } else {
             Node<T> cur = front;
             while(cur.next != null) {
@@ -49,10 +51,28 @@ public class DoubleLinkedList<T> implements IList<T> {
      * @modifies    this
      * @effect      remove the list element in the list
      * @return      the listnode that is removed
+     * @throws      EmptyContainerException if there is no element in the list
      */
     @Override
     public T remove() {
-        throw new NotYetImplementedException();
+        if (front == null) {
+            throw new EmptyContainerException("container is empty and there is no element to remove");
+        } else {
+            T removed = null;
+            if (front.next == null) {
+                removed = front.data;
+                front = null;
+                back = null;
+            } else {
+                Node<T> cur = front;
+                while(cur.next.next != null) {
+                    cur = cur.next;
+                }
+                removed = cur.next.data;
+                cur.next = null;
+            }
+            return removed;
+        }
     }
 
     @Override
