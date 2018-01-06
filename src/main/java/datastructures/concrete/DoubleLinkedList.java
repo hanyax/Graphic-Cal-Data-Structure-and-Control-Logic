@@ -1,6 +1,5 @@
 package datastructures.concrete;
 
-import datastructures.concrete.DoubleLinkedList.Node;
 import datastructures.interfaces.IList;
 import misc.exceptions.EmptyContainerException;
 import misc.exceptions.NotYetImplementedException;
@@ -36,10 +35,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             front = new Node<T>(null, item, null);
             back = front;
         } else {
-            Node<T> cur = front;
-            while(cur.next != null) {
-                cur = cur.next;
-            }
+            Node<T> cur = back;
             cur.next = new Node<T>(cur, item, null);
             back = cur.next;
         }
@@ -58,26 +54,29 @@ public class DoubleLinkedList<T> implements IList<T> {
         if (front == null) {
             throw new EmptyContainerException("container is empty and there is no element to remove");
         } else {
+            size --;
             T removed = null;
             if (front.next == null) {
                 removed = front.data;
                 front = null;
                 back = null;
             } else {
-                Node<T> cur = front;
-                while(cur.next.next != null) {
-                    cur = cur.next;
-                }
-                removed = cur.next.data;
-                cur.next = null;
+                removed = back.data;
+                back = back.prev;
+                back.next = null;
             }
             return removed;
         }
     }
 
+    /**
+     * @require index is in the range of list
+     * @return the item at index
+     * @throws IndexOutOfBoundsException if index is out of bounce
+     */
     @Override
     public T get(int index) {
-        throw new NotYetImplementedException();
+        
     }
 
     @Override

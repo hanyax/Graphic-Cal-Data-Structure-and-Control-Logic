@@ -64,10 +64,50 @@ public class TestDoubleLinkedList extends BaseTest {
      * certainly doing something wrong.
      */
     
+    ////////////////////////////////////
+    // New test delete case goes here
+    ////////////////////////////////////
+    
     @Test(timeout=SECOND)
     public void testDelete() {
         IList<String> list = makeBasicList();
+        String a = list.delete(0);
+        assertEquals(a, "a");
+        assertListMatches(new String[] {"b", "c"}, list);
         
+        String b = list.delete(0);
+        assertEquals(b, "b");
+        assertListMatches(new String[] {"c"}, list);
+        
+        String c = list.delete(0);
+        assertEquals(c, "c");
+        assertListMatches(new String[] {}, list);
+        
+        IList<String> list2 = makeBasicList();
+        String b2 = list.delete(1);
+        assertEquals(b2, "b");
+        assertListMatches(new String[] {"a", "c"}, list);
+        
+        IList<String> list3 = makeBasicList();
+        String c2 = list.delete(2);
+        assertEquals(c2, "b");
+        assertListMatches(new String[] {"a", "b"}, list);
+    }
+    
+    @Test
+    public void testDeleteException() {
+        IList<String> list = makeBasicList();
+        try {
+            list.delete(-1);
+            fail("Did not throw exception when detele at index -1");
+        } catch (IndexOutOfBoundsException exception) {
+        }
+        
+        try {
+            list.delete(3);
+            fail("Did not throw exception when detele at index 3");
+        } catch (IndexOutOfBoundsException exception) {
+        }
     }
 
     @Test(timeout=SECOND)
