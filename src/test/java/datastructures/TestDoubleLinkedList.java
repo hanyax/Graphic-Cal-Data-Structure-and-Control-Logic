@@ -27,7 +27,7 @@ public class TestDoubleLinkedList extends BaseTest {
         list.add("a");
         list.add("b");
         list.add("c");
-
+        
         return list;
     }
 
@@ -84,14 +84,14 @@ public class TestDoubleLinkedList extends BaseTest {
         assertListMatches(new String[] {}, list);
         
         IList<String> list2 = makeBasicList();
-        String b2 = list.delete(1);
+        String b2 = list2.delete(1);
         assertEquals(b2, "b");
-        assertListMatches(new String[] {"a", "c"}, list);
+        assertListMatches(new String[] {"a", "c"}, list2);
         
         IList<String> list3 = makeBasicList();
-        String c2 = list.delete(2);
-        assertEquals(c2, "b");
-        assertListMatches(new String[] {"a", "b"}, list);
+        String c2 = list3.delete(2);
+        assertEquals(c2, "c");
+        assertListMatches(new String[] {"a", "b"}, list3);
     }
     
     @Test
@@ -229,7 +229,9 @@ public class TestDoubleLinkedList extends BaseTest {
         }
 
         // This should be ok
-        list.get(2);
+        assertEquals(list.get(2), "c");
+        assertEquals(list.get(1), "b");
+        assertEquals(list.get(0), "a");
 
         try {
             // Now we're out of bounds
@@ -329,6 +331,9 @@ public class TestDoubleLinkedList extends BaseTest {
 
         list.insert(5, "z");
         this.assertListMatches(new String[] {"x", "a", "y", "b", "c", "z"}, list);
+        
+        list.insert(5, "z");
+        this.assertListMatches(new String[] {"x", "a", "y", "b", "c", "z", "z"}, list);
     }
 
     @Test(timeout=SECOND)

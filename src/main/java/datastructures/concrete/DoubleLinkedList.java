@@ -31,15 +31,7 @@ public class DoubleLinkedList<T> implements IList<T> {
      */
     @Override
     public void add(T item) {
-        if (front == null) {
-            front = new Node<T>(null, item, null);
-            back = front;
-        } else {
-            Node<T> cur = back;
-            cur.next = new Node<T>(cur, item, null);
-            back = cur.next;
-        }
-        size++;
+       insert(size, item);
     }
     
     /**
@@ -76,27 +68,193 @@ public class DoubleLinkedList<T> implements IList<T> {
      */
     @Override
     public T get(int index) {
-        
+        if(index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        } else {
+            if (index <= size/2) {
+                Node<T> cur = front;
+                for (int i = 0; i < index; i++) {
+                    cur = cur.next;
+                }
+                return cur.data;
+            } else {
+                Node<T> cur = back;
+                for (int i = size - 1; i > index; i--) {
+                    cur = cur.prev;
+                }
+                return cur.data;
+            }
+        }
     }
-
+    
+    /**
+     * @require index is in the range of list
+     * @modifies this
+     * @effects reset the data at index
+     * @throws IndexOutOfBoundsException if index is out of bounce
+     */
     @Override
     public void set(int index, T item) {
-        throw new NotYetImplementedException();
+        if(index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        } else {
+            Node<T> newNode = new Node<T>(item);
+            if (index == 0) {
+                newNode.next = front.next;
+                if (size - 1 != 0) {
+                    front.next.prev = newNode;
+                } else {
+                    back = newNode;
+                }
+                front = newNode;
+            } else if (index == size - 1) {
+                newNode.prev = back.prev;
+                back.prev.next = newNode;
+                back = newNode;
+            } else {
+                if (index <= size/2) {
+                    Node<T> cur = front;
+                    for (int i = 0; i < index; i++) {
+                        cur = cur.next;
+                    }
+                    newNode.prev = cur.prev;
+                    newNode.next = cur.next;
+                    cur.prev.next = newNode;
+                    cur.next.prev = newNode;
+                } else {
+                    Node<T> cur = back;
+                    for (int i = size - 1; i > index; i--) {
+                        cur = cur.prev;
+                    }
+                    newNode.prev = cur.prev;
+                    newNode.next = cur.next;
+                    cur.prev.next = newNode;
+                    cur.next.prev = newNode;
+                }
+            }
+        }
     }
-
+    
+    /**
+     * @require index is in the range of list
+     * @modifies this
+     * @effects reset the data at index
+     * @throws IndexOutOfBoundsException if index is out of bounce
+     */
     @Override
     public void insert(int index, T item) {
-        throw new NotYetImplementedException();
+        if(index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        } else {
+            Node<T> newNode = new Node<T>(item);
+            if (index == 0) {
+                if (size == 0) {
+                    this.front = newNode;
+                    this.back = newNode;
+                } else {
+                    newNode.next = front;
+                    front.prev = newNode;
+                    this.front = newNode;
+                }
+            } else if (index == size) {
+                back.next = newNode;
+                newNode.prev = back;
+                back = newNode;
+            } else {
+                if (index <= size/2) {
+                    Node<T> cur = front;
+                    for (int i = 0; i < index - 1; i++) {
+                        cur = cur.next;
+                    }
+                    newNode.next = cur.next;
+                    cur.next.prev = newNode;
+                    newNode.prev = cur;
+                    cur.next = newNode;
+                } else {
+                    Node<T> cur = back;
+                    for (int i = size - 1; i >= index; i--) {
+                        cur = cur.prev;
+                    }
+                    newNode.next = cur.next;
+                    cur.next.prev = newNode;
+                    newNode.prev = cur;
+                    cur.next = newNode;
+                }
+            }
+            size++;
+        }
     }
-
+    
+    /**
+     * @require index is in the range of list
+     * @modifies this
+     * @effects delete data at index and shift the rest of list to the left by one
+     * @throws IndexOutOfBoundsException if index is out of bounce
+     * @return the deleted node data
+     */
     @Override
     public T delete(int index) {
-        throw new NotYetImplementedException();
+        if(index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        } else {
+            T data = null;
+            if (index == 0) {
+               data = front.data;
+               if (size == 1) {
+                   front = null;
+                   back = null;
+               } else {
+                   front = front.next;
+                   front.prev = null;
+               }
+            } else if (index == size - 1) {
+                data = back.data;
+                back = back.prev;
+                back.next = null;
+            } else {
+                Node<T> cur = null;
+                if (index <= size/2) {
+                    cur = front;
+                    for (int i = 0; i < index; i++) {
+                        cur = cur.next;
+                    }
+                    cur.prev.next = cur.next;
+                    cur.next.prev = cur.prev;
+                } else {
+                    cur = back;
+                    for (int i = size - 1; i > index; i--) {
+                        cur = cur.prev;
+                    }
+                    cur.prev.next = cur.next;
+                    cur.next.prev = cur.prev;
+                }
+                data = cur.data;
+            }
+            size--;
+            return data;
+        }
     }
-
+    
+    /**
+     * @return the index of given item, if item is not in the list, return -1
+     * 
+     */
     @Override
     public int indexOf(T item) {
-        throw new NotYetImplementedException();
+        Node<T> cur = front;
+        if (front.data.equals(item)) {
+            return 0;
+        } else {
+            int index = 0;
+            while(cur.next != null) {
+                cur = cur.next;
+                index++;
+                if ((item == null && cur.data == null) || cur.data.equals(item)) {
+                    return index;
+                }
+            }
+            return -1;
+        }
     }
     
     /**
@@ -106,12 +264,25 @@ public class DoubleLinkedList<T> implements IList<T> {
     public int size() {
         return size;
     }
-
+    
+    /**
+     * Return true if T item exist in list, false otherwise
+     */
     @Override
     public boolean contains(T other) {
-        throw new NotYetImplementedException();
+        return (indexOf(other) != -1);
     }
-
+    
+    ///  Helping test
+    public String toString() {
+        String result = front.toString();
+        Node<T> cur = front;
+        while (cur.next != null) {
+            result += "!!!!!" + cur.toString();
+        }
+        return result;
+    }
+    
     @Override
     public Iterator<T> iterator() {
         // Note: we have provided a part of the implementation of
@@ -136,7 +307,10 @@ public class DoubleLinkedList<T> implements IList<T> {
         public Node(E data) {
             this(null, data, null);
         }
-
+        
+        public String toString() {
+            return data.toString();
+        }
         // Feel free to add additional constructors or methods to this class.
     }
 
@@ -154,7 +328,11 @@ public class DoubleLinkedList<T> implements IList<T> {
          * returns 'false' otherwise.
          */
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+            if (current == null) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
         /**
@@ -165,7 +343,13 @@ public class DoubleLinkedList<T> implements IList<T> {
          *         there are no more elements to look at.
          */
         public T next() {
-            throw new NotYetImplementedException();
+            if (hasNext()) {
+               T data = current.data;
+               current = current.next;
+               return data;
+            } else {   
+                throw new NoSuchElementException("No more element in the list");
+            }
         }
     }
 }
