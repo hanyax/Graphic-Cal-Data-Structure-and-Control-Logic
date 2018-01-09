@@ -1,11 +1,10 @@
 package datastructures.concrete;
 
 import datastructures.interfaces.IList;
-import misc.exceptions.EmptyContainerException;
-import misc.exceptions.NotYetImplementedException;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import misc.exceptions.EmptyContainerException;
+
 
 /**
  * Note: For more info on the expected behavior of your methods, see
@@ -18,7 +17,10 @@ public class DoubleLinkedList<T> implements IList<T> {
     private Node<T> front;
     private Node<T> back;
     private int size;
-
+    
+    /**
+     * Init a empty list.
+     */
     public DoubleLinkedList() {
         this.front = null;
         this.back = null;
@@ -26,6 +28,8 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
+     * add.
+     * @param       item added
      * @modifies    this
      * @effect      add item to the end of list
      */
@@ -35,18 +39,18 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
+     * remove.
      * @requires    this != empty
-     * @modifies    this
-     * @effect      remove the list element in the list
-     * @return      the listnode that is removed
+     * @return      the list node that is removed
      * @throws      EmptyContainerException if there is no element in the list
      */
     @Override
     public T remove() {
         if (front == null) {
-            throw new EmptyContainerException("container is empty and there is no element to remove");
+            throw new EmptyContainerException(
+                    "container is empty and there is no element to remove");
         } else {
-            size --;
+            size--;
             T removed = null;
             if (front.next == null) {
                 removed = front.data;
@@ -62,16 +66,18 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
 
     /**
+     * get.
+     * @param   index to get
      * @require index is in the range of list
-     * @return the item at index
-     * @throws IndexOutOfBoundsException if index is out of bounce
+     * @return  the item at index
+     * @throws  IndexOutOfBoundsException if index is out of bounce
      */
     @Override
     public T get(int index) {
-        if(index < 0 || index >= size) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of bounds");
         } else {
-            if (index <= size/2) {
+            if (index <= size / 2) {
                 Node<T> cur = front;
                 for (int i = 0; i < index; i++) {
                     cur = cur.next;
@@ -88,6 +94,8 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
+     * set.
+     * @param index item
      * @require index is in the range of list
      * @modifies this
      * @effects reset the data at index
@@ -95,7 +103,7 @@ public class DoubleLinkedList<T> implements IList<T> {
      */
     @Override
     public void set(int index, T item) {
-        if(index < 0 || index >= size) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of bounds");
         } else {
             Node<T> newNode = new Node<T>(item);
@@ -112,7 +120,7 @@ public class DoubleLinkedList<T> implements IList<T> {
                 back.prev.next = newNode;
                 back = newNode;
             } else {
-                if (index <= size/2) {
+                if (index <= size / 2) {
                     Node<T> cur = front;
                     for (int i = 0; i < index; i++) {
                         cur = cur.next;
@@ -136,6 +144,8 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
+     * insert.
+     * @param index item
      * @require index is in the range of list
      * @modifies this
      * @effects reset the data at index
@@ -143,7 +153,7 @@ public class DoubleLinkedList<T> implements IList<T> {
      */
     @Override
     public void insert(int index, T item) {
-        if(index < 0 || index > size) {
+        if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("Index out of bounds");
         } else {
             Node<T> newNode = new Node<T>(item);
@@ -161,7 +171,7 @@ public class DoubleLinkedList<T> implements IList<T> {
                 newNode.prev = back;
                 back = newNode;
             } else {
-                if (index <= size/2) {
+                if (index <= size / 2) {
                     Node<T> cur = front;
                     for (int i = 0; i < index - 1; i++) {
                         cur = cur.next;
@@ -186,15 +196,17 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
-     * @require index is in the range of list
-     * @modifies this
-     * @effects delete data at index and shift the rest of list to the left by one
-     * @throws IndexOutOfBoundsException if index is out of bounce
-     * @return the deleted node data
+     * delete.
+     * @param       index to delete
+     * @require     index is in the range of list
+     * @modifies    this
+     * @effects     delete data at index and shift the rest of list to the left by one
+     * @throws      IndexOutOfBoundsException if index is out of bounce
+     * @return      the deleted node data
      */
     @Override
     public T delete(int index) {
-        if(index < 0 || index >= size) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of bounds");
         } else {
             T data = null;
@@ -213,7 +225,7 @@ public class DoubleLinkedList<T> implements IList<T> {
                 back.next = null;
             } else {
                 Node<T> cur = null;
-                if (index <= size/2) {
+                if (index <= size / 2) {
                     cur = front;
                     for (int i = 0; i < index; i++) {
                         cur = cur.next;
@@ -236,8 +248,9 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
-     * @return the index of given item, if item is not in the list, return -1
-     * 
+     * indexOf.
+     * @param   item to find index
+     * @return  the index of given item, if item is not in the list, return -1
      */
     @Override
     public int indexOf(T item) {
@@ -246,7 +259,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             return 0;
         } else {
             int index = 0;
-            while(cur.next != null) {
+            while (cur.next != null) {
                 cur = cur.next;
                 index++;
                 if ((item == null && cur.data == null) || cur.data.equals(item)) {
@@ -258,6 +271,7 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
+     * size.
      * @return  size of the list
      */
     @Override
@@ -266,21 +280,11 @@ public class DoubleLinkedList<T> implements IList<T> {
     }
     
     /**
-     * Return true if T item exist in list, false otherwise
+     * Return true if T item exist in list, false otherwise.
      */
     @Override
     public boolean contains(T other) {
         return (indexOf(other) != -1);
-    }
-    
-    ///  Helping test
-    public String toString() {
-        String result = front.toString();
-        Node<T> cur = front;
-        while (cur.next != null) {
-            result += "!!!!!" + cur.toString();
-        }
-        return result;
     }
     
     @Override
@@ -328,11 +332,7 @@ public class DoubleLinkedList<T> implements IList<T> {
          * returns 'false' otherwise.
          */
         public boolean hasNext() {
-            if (current == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return current != null;
         }
 
         /**

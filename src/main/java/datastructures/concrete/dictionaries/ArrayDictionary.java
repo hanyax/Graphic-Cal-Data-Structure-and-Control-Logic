@@ -1,7 +1,9 @@
 package datastructures.concrete.dictionaries;
 
+import java.util.Arrays;
+
 import datastructures.interfaces.IDictionary;
-import misc.exceptions.NotYetImplementedException;
+import misc.exceptions.NoSuchKeyException;
 
 /**
  * See IDictionary for more details on what this class should do
@@ -10,11 +12,14 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     // You may not change or rename this field: we will be inspecting
     // it using our private tests.
     private Pair<K, V>[] pairs;
+    private int size;
+    public static final int DEFAULT_CAPACITY  = 4;
 
     // You're encouraged to add extra fields (and helper methods) though!
 
     public ArrayDictionary() {
-        throw new UnsupportedOperationException();
+        size = 0;
+        pairs = this.makeArrayOfPairs(DEFAULT_CAPACITY);
     }
 
     /**
@@ -36,32 +41,99 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // type erasure is, or how arrays and generics interact. Do not
         // modify this method in any way.
         return (Pair<K, V>[]) (new Pair[arraySize]);
-
     }
-
+    
+    /**
+     * @return  the value corresponding to the given key
+     * @throws  NoSuchKeyException if the dictionary does not contain the given key
+     */
     @Override
     public V get(K key) {
-        throw new NotYetImplementedException();
+        for (int i = 0; i < size; i++) {
+            if ((key == null && pairs[i].key == null) || pairs[i].key.equals(key)) {
+                return pairs[i].value;
+            }
+        }
+        throw new NoSuchKeyException("Key does not exist");
     }
-
+    
+    /**
+     * @modifies    this
+     * @effect      Adds the key-value pair to the dictionary. If the key 
+     *              already exists in the dictionary, replace its value with the given one.
+     */
     @Override
     public void put(K key, V value) {
-        throw new NotYetImplementedException();
+        if (this.containsKey(key)) {
+            for (int i = 0; i < size; i++) {
+                if ((key == null && pairs[i].key == null) || pairs[i].key.equals(key)) {
+                    pairs[i].value = value;
+                }
+            } 
+        } else {
+            size++;           
+            ensureCapacity();
+            pairs[size - 1] = new Pair<K, V>(key, value);
+        }
+    }
+    
+    /**
+     * Make sure the array has enough capacity
+     */
+    private void ensureCapacity() {
+       if (pairs.length <= size) {
+           int newCapacity = pairs.length * 2;
+           pairs = Arrays.copyOf(pairs, newCapacity);
+       }
     }
 
+    /**
+     * @modifies    this
+     * @effect      Remove the key-value pair corresponding to the given key from the dictionary.
+     * @throws      NoSuchKeyException if the dictionary does not contain the given key.
+     */
     @Override
     public V remove(K key) {
-        throw new NotYetImplementedException();
+        if (!this.containsKey(key)) {
+            throw new NoSuchKeyException("Can not remove an non-existed key");
+        }
+        int i = 0;
+        if (key == null) {
+            while (pairs[i].key!= null) {
+                i++;
+            }
+        } else {
+            while (!pairs[i].key.equals(key)) {
+                i++;
+            }
+        }
+        V removed = pairs[i].value;
+        for (int j = i; j < size - 1; j++) {
+            pairs[j] = pairs[j + 1];
+        }
+        size--;
+        return removed;
     }
-
+    
+    /**
+     * @return true if key is in the dics, otherwise false
+     */
     @Override
     public boolean containsKey(K key) {
-        throw new NotYetImplementedException();
+        for (int i = 0; i < size; i++) {
+            if ((key == null && pairs[i].key == null) || pairs[i].key.equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
-
+    
+    /**
+     * @return   the size of the disc
+     */
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.size;
     }
 
     private static class Pair<K, V> {
