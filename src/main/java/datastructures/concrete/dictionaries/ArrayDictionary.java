@@ -14,7 +14,14 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     // You're encouraged to add extra fields (and helper methods) though!
 
     public ArrayDictionary() {
-        throw new UnsupportedOperationException();
+        this(4);
+    }
+    
+    public ArrayDictionary(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("capacity must be positive: " + capacity);
+        }
+        pairs = makeArrayOfPairs(capacity);
     }
 
     /**
@@ -41,7 +48,9 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
 
     @Override
     public V get(K key) {
-        throw new NotYetImplementedException();
+        if () {
+            
+        }
     }
 
     @Override
