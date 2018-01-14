@@ -2,7 +2,9 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 import calculator.errors.EvaluationError;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
+import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
 
 /**
@@ -37,7 +39,7 @@ public class ExpressionManipulators {
     public static AstNode handleToDouble(Environment env, AstNode node) {
         // To help you get started, we've implemented this method for you.
         // You should fill in the TODOs in the 'toDoubleHelper' method.
-        return new AstNode(toDoubleHelper(env.getVariables(), node.getChildren().get(0)));
+        return new AstNode(toDoubleHelper(env.getVariables(), node));
     }
 
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
@@ -49,26 +51,38 @@ public class ExpressionManipulators {
                 throw new EvaluationError("Undefined Variable");
             } 
             return variables.get(node.getName()).getNumericValue();
+        } else if(node.getName().equals("toDouble")) {
+            return toDoubleHelper(variables, node.getChildren().get(0));
         } else {
             String name = node.getName();
-            if(name.equals("+")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
-            } else if (name.equals("-")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
-            } else if (name.equals("*")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
-            } else if (name.equals("/")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(1));
-            } else if (name.equals("^")) {
-                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1)));
-            } else if (name.equals("negate")) {
-                return -toDoubleHelper(variables, node.getChildren().get(0));
-            } else if (name.equals("sin")) {
-                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
-            } else if (name.equals("cos")) {
-                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+            if (node.getChildren().size() == 2) {
+                if(name.equals("+")) {
+                    //Debug
+                    System.out.println(node.getChildren().get(0).getNumericValue() + "   " + node.getChildren().get(0).getNumericValue());
+                    System.out.println(toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1)));
+                    return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
+                    
+                } else if (name.equals("-")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("*")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("/")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0) ) / toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("^")) {
+                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1)));
+                } else {
+                    throw new EvaluationError("Unknown Operation");
+                }
             } else {
-                throw new EvaluationError("Unknown Operation");
+                if (name.equals("negate")) {
+                    return -toDoubleHelper(variables, node.getChildren().get(0));
+                } else if (name.equals("sin")) {
+                    return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+                } else if (name.equals("cos")) {
+                    return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+                } else {
+                    throw new EvaluationError("Unknown Operation");
+                }
             }
         }
     }
@@ -108,11 +122,65 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(Environment env, IDictionary<String, AstNode> variables, AstNode node) {
-        return node;
+        if (node.isOperation()) {
+            if (node.getChildren().size() == 2) {
+                AstNode left = node.getChildren().get(0);
+                AstNode right = node.getChildren().get(1);
+    
+                if (left.isOperation()) {
+                    if (right.isOperation()) {
+                        left = handleSimplifyHelper(env, variables, left);
+                        right = handleSimplifyHelper(env, variables, right);
+                    } else {
+                        left = handleSimplifyHelper(env, variables, left);
+                    }
+                } else {
+                    if (right.isOperation()) {
+                        right = handleSimplifyHelper(env, variables, right);
+                    } else {
+                        if ((left.isNumber() || variables.containsKey(left.getName()))  
+                                && (right.isNumber() || variables.containsKey(right.getName()))) {
+                            String name = node.getName();
+                            if (name.equals("+")) {  
+                                return new AstNode( handleToDouble(env, left).getNumericValue() +  handleToDouble(env, right).getNumericValue());
+                            } else if(name.equals("-")) {
+                                return new AstNode( handleToDouble(env, left).getNumericValue() -  handleToDouble(env, right).getNumericValue());
+                            } else if(name.equals("*")) {
+                                return new AstNode( handleToDouble(env, left).getNumericValue() *  handleToDouble(env, right).getNumericValue());
+                            }
+                            
+                        } else if (left.isVariable() && !variables.containsKey(left.getName())) {
+                            if (right.isVariable() && variables.containsKey(right.getName())) {
+                                right = new AstNode(variables.get(right.getName()).getNumericValue());
+                            } 
+                        } else if (right.isVariable() && !variables.containsKey(right.getName())) {
+                            if (left.isVariable() && variables.containsKey(left.getName())) {
+                                left = new AstNode(variables.get(left.getName()).getNumericValue());
+                            } 
+                        }
+                    }
+                }
+                IList<AstNode> children = new DoubleLinkedList<>();         
+                children.add(left);
+                children.add(right);
+                return new AstNode(node.getName(), children);
+            } else {
+                AstNode next = node.getChildren().get(0);
+                next = handleSimplifyHelper(env, variables, next);
+                IList<AstNode> children = new DoubleLinkedList<>();    
+                children.add(next);
+                return new AstNode(node.getName(), children);
+            }
+        } else if (node.isNumber()) {
+            return node;
+        } else {
+            if (variables.containsKey(node.getName())) {
+                return new AstNode(variables.get(node.getName()).getNumericValue());
+            } else {
+                return node;
+            }
+        }
     }
-
-    
-    
 
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
