@@ -123,68 +123,28 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(Environment env, IDictionary<String, AstNode> variables, AstNode node) {
-        if (node.isOperation()) {
-            if (node.getChildren().size() == 2) {
-                AstNode left = node.getChildren().get(0);
-                AstNode right = node.getChildren().get(1);
-    
-                if (left.isOperation()) {
-                    if (right.isOperation()) {
-                        left = handleSimplifyHelper(env, variables, left);
-                        right = handleSimplifyHelper(env, variables, right);
-                    } else {
-                        left = handleSimplifyHelper(env, variables, left);
-                    }
-                } else {
-                    if (right.isOperation()) {
-                        right = handleSimplifyHelper(env, variables, right);
-                    } else {
-                        if ((left.isNumber() || variables.containsKey(left.getName()))  
-                                && (right.isNumber() || variables.containsKey(right.getName()))) {
-                            String name = node.getName();
-                            if (name.equals("+")) {  
-                                return new AstNode( handleToDouble(env, left).getNumericValue() +  handleToDouble(env, right).getNumericValue());
-                            } else if(name.equals("-")) {
-                                return new AstNode( handleToDouble(env, left).getNumericValue() -  handleToDouble(env, right).getNumericValue());
-                            } else if(name.equals("*")) {
-                                return new AstNode( handleToDouble(env, left).getNumericValue() *  handleToDouble(env, right).getNumericValue());
-                            }
-                            
-                        } else if (left.isVariable() && !variables.containsKey(left.getName())) {
-                            if (right.isVariable() && variables.containsKey(right.getName())) {
-                                right = new AstNode(variables.get(right.getName()).getNumericValue());
-                            } 
-                        } else if (right.isVariable() && !variables.containsKey(right.getName())) {
-                            if (left.isVariable() && variables.containsKey(left.getName())) {
-                                left = new AstNode(variables.get(left.getName()).getNumericValue());
-                            } 
-                        }
-                    }
-                }
-                IList<AstNode> children = new DoubleLinkedList<>();         
-                children.add(left);
-                children.add(right);
-                return new AstNode(node.getName(), children);
-            } else {
-                AstNode next = node.getChildren().get(0);
-                next = handleSimplifyHelper(env, variables, next);
-                IList<AstNode> children = new DoubleLinkedList<>();    
-                children.add(next);
-                return new AstNode(node.getName(), children);
-            }
-        } else if (node.isNumber()) {
+        if (node.isNumber() || node.isVariable() && !variables.containsKey(node.getName())) {
             return node;
+        } else if (node.isVariable() && variables.containsKey(node.getName())) {
+            return variables.get(node.getName());
         } else {
-            if (variables.containsKey(node.getName())) {
-                if (variables.get(node.getName()).isNumber()) {
-                    return new AstNode(variables.get(node.getName()).getNumericValue());
-                } else {
-                    return variables.get(node.getName());
-                }
-            } else {
-                return node;
+            int size = node.getChildren().size();
+            AstNode left = handleSimplifyHelper(env, variables, node.getChildren().get(0));
+            AstNode right = null;
+            if (size == 2) {
+                right = handleSimplifyHelper(env, variables, node.getChildren().get(1));
             }
+            String name = node.getName();
+            if ((name.equals("+") || name.equals("-") || name.equals("*")) && left.isNumber() && right.isNumber()) {
+                return handleToDouble(env, node);
+            } 
+            node.getChildren().set(0, left);
+            if (size == 2) {
+                node.getChildren().set(1, right);
+            }
+            return node;
         }
+
     }
 
     /**
