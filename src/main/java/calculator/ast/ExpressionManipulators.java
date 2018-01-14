@@ -43,16 +43,33 @@ public class ExpressionManipulators {
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
         // There are three types of nodes, so we have three cases.
         if (node.isNumber()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            return node.getNumericValue();
         } else if (node.isVariable()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            if (!variables.containsKey(node.getName())) {
+                throw new EvaluationError("Undefined Variable");
+            } 
+            return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
-
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            if(name.equals("+")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("-")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("*")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("/")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("^")) {
+                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1)));
+            } else if (name.equals("negate")) {
+                return -toDoubleHelper(variables, node.getChildren().get(0));
+            } else if (name.equals("sin")) {
+                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+            } else if (name.equals("cos")) {
+                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+            } else {
+                throw new EvaluationError("Unknown Operation");
+            }
         }
     }
 
@@ -87,8 +104,15 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        throw new NotYetImplementedException();
+        return handleSimplifyHelper(env, env.getVariables(), node.getChildren().get(0));
     }
+    
+    private static AstNode handleSimplifyHelper(Environment env, IDictionary<String, AstNode> variables, AstNode node) {
+        return node;
+    }
+
+    
+    
 
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
