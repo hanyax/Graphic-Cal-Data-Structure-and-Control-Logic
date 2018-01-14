@@ -49,19 +49,20 @@ public class ExpressionManipulators {
         } else if (node.isVariable()) {
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined Variable");
-            } 
-            return variables.get(node.getName()).getNumericValue();
+            } else {
+                if(variables.get(node.getName()).isNumber()) {
+                    return variables.get(node.getName()).getNumericValue();
+                } else {
+                    return toDoubleHelper(variables, variables.get(node.getName()));
+                }
+            }
         } else if(node.getName().equals("toDouble")) {
             return toDoubleHelper(variables, node.getChildren().get(0));
         } else {
             String name = node.getName();
             if (node.getChildren().size() == 2) {
                 if(name.equals("+")) {
-                    //Debug
-                    System.out.println(node.getChildren().get(0).getNumericValue() + "   " + node.getChildren().get(0).getNumericValue());
-                    System.out.println(toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1)));
                     return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
-                    
                 } else if (name.equals("-")) {
                     return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
                 } else if (name.equals("*")) {
@@ -175,7 +176,11 @@ public class ExpressionManipulators {
             return node;
         } else {
             if (variables.containsKey(node.getName())) {
-                return new AstNode(variables.get(node.getName()).getNumericValue());
+                if (variables.get(node.getName()).isNumber()) {
+                    return new AstNode(variables.get(node.getName()).getNumericValue());
+                } else {
+                    return variables.get(node.getName());
+                }
             } else {
                 return node;
             }
