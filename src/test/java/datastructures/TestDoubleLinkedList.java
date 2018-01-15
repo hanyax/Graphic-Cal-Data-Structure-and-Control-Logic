@@ -70,28 +70,38 @@ public class TestDoubleLinkedList extends BaseTest {
     
     @Test(timeout=SECOND)
     public void testDelete() {
-        IList<String> list = makeBasicList();
+        DoubleLinkedList<String> list = (DoubleLinkedList<String>) makeBasicList();
         String a = list.delete(0);
         assertEquals(a, "a");
         assertListMatches(new String[] {"b", "c"}, list);
+        assertEquals(list.getFront(), "b");
+        assertEquals(list.getBack(), "c");
         
         String b = list.delete(0);
         assertEquals(b, "b");
         assertListMatches(new String[] {"c"}, list);
+        assertEquals(list.getFront(), "c");
+        assertEquals(list.getBack(), "c");
         
         String c = list.delete(0);
         assertEquals(c, "c");
         assertListMatches(new String[] {}, list);
+        assertEquals(list.getFront(), null);
+        assertEquals(list.getBack(), null);
         
-        IList<String> list2 = makeBasicList();
+        DoubleLinkedList<String> list2 = (DoubleLinkedList<String>) makeBasicList();
         String b2 = list2.delete(1);
         assertEquals(b2, "b");
         assertListMatches(new String[] {"a", "c"}, list2);
+        assertEquals(list2.getFront(), "a");
+        assertEquals(list2.getBack(), "c");
         
-        IList<String> list3 = makeBasicList();
+        DoubleLinkedList<String> list3 = (DoubleLinkedList<String>) makeBasicList();
         String c2 = list3.delete(2);
         assertEquals(c2, "c");
         assertListMatches(new String[] {"a", "b"}, list3);
+        assertEquals(list3.getFront(), "a");
+        assertEquals(list3.getBack(), "b");
     }
     
     @Test
@@ -101,13 +111,17 @@ public class TestDoubleLinkedList extends BaseTest {
             list.delete(-1);
             fail("Did not throw exception when detele at index -1");
         } catch (IndexOutOfBoundsException exception) {
+            // Good
         }
         
         try {
             list.delete(3);
             fail("Did not throw exception when detele at index 3");
         } catch (IndexOutOfBoundsException exception) {
+            // Good
         }
+        
+        
     }
 
     @Test(timeout=SECOND)

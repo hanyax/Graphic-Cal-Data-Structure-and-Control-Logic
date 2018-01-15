@@ -287,6 +287,22 @@ public class DoubleLinkedList<T> implements IList<T> {
         return (indexOf(other) != -1);
     }
     
+    public T getFront() {
+        if (this.front !=null) {
+            return this.front.data;
+        } else {
+            return null;
+        }
+    }
+    
+    public T getBack() {
+        if (this.back !=null) {
+            return this.back.data;
+        } else {
+            return null;
+        }
+    }
+    
     @Override
     public Iterator<T> iterator() {
         // Note: we have provided a part of the implementation of
