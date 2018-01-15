@@ -1,8 +1,13 @@
 package calculator.ast;
 
 import calculator.interpreter.Environment;
+
+import java.awt.geom.Rectangle2D;
+
 import calculator.errors.EvaluationError;
+import calculator.gui.*;
 import datastructures.concrete.DoubleLinkedList;
+import datastructures.concrete.dictionaries.ArrayDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
@@ -144,7 +149,6 @@ public class ExpressionManipulators {
             }
             return node;
         }
-
     }
 
     /**
@@ -182,9 +186,33 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative
      */
     public static AstNode plot(Environment env, AstNode node) {
-        // TODO: Your code here
-        throw new NotYetImplementedException();
-
+        IDictionary<String, AstNode> variables = env.getVariables();
+        String variable = node.getChildren().get(1).getName();
+        if(variables.containsKey(variable)) {
+            throw new EvaluationError("'var' was already defined");
+        }
+        double xMin = toDoubleHelper(variables, node.getChildren().get(2));
+        double xMax = toDoubleHelper(variables, node.getChildren().get(3));
+        if (xMin >= xMax) {
+            throw new EvaluationError("varMin > varMax");
+        }
+        double interval = toDoubleHelper(variables, node.getChildren().get(4));
+        if (interval <= 0) {
+            throw new EvaluationError("'step' is zero or negative");
+        }
+        AstNode function = handleSimplify(env, node);
+        IList<Double> xList = new DoubleLinkedList<Double>();
+        IList<Double> yList = new DoubleLinkedList<Double>();
+       
+        IDictionary<String, AstNode> xVars = new ArrayDictionary<String, AstNode>();
+        for(double i = xMin; i <= xMax; i+= interval) {
+            xVars.put(variable, new AstNode(i));
+            xList.add(i);
+            yList.add(toDoubleHelper(xVars, function));
+        }
+        ImageDrawer drawer = env.getImageDrawer();
+        drawer.drawScatterPlot("title", "xAxisLabel", "yAxisLabel", xList, yList); 
+                
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -194,6 +222,6 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-        // return new AstNode(1);
+        return new AstNode(1);
     }
 }
