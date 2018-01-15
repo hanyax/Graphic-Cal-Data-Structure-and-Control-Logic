@@ -2,15 +2,13 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 
-import java.awt.geom.Rectangle2D;
 
 import calculator.errors.EvaluationError;
-import calculator.gui.*;
+import calculator.gui.ImageDrawer;
 import datastructures.concrete.DoubleLinkedList;
 import datastructures.concrete.dictionaries.ArrayDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
-import misc.exceptions.NotYetImplementedException;
 
 /**
  * All of the static methods in this class are given the exact same parameters for
@@ -43,7 +41,7 @@ public class ExpressionManipulators {
      */
     public static AstNode handleToDouble(Environment env, AstNode node) {
         // To help you get started, we've implemented this method for you.
-        // You should fill in the TODOs in the 'toDoubleHelper' method.
+
         return new AstNode(toDoubleHelper(env.getVariables(), node));
     }
 
@@ -55,27 +53,32 @@ public class ExpressionManipulators {
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined Variable");
             } else {
-                if(variables.get(node.getName()).isNumber()) {
+                if (variables.get(node.getName()).isNumber()) {
                     return variables.get(node.getName()).getNumericValue();
                 } else {
                     return toDoubleHelper(variables, variables.get(node.getName()));
                 }
             }
-        } else if(node.getName().equals("toDouble")) {
+        } else if (node.getName().equals("toDouble")) {
             return toDoubleHelper(variables, node.getChildren().get(0));
         } else {
             String name = node.getName();
             if (node.getChildren().size() == 2) {
-                if(name.equals("+")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
+                if (name.equals("+")) {
+                    return toDoubleHelper(variables, 
+                            node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
                 } else if (name.equals("-")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
+                    return toDoubleHelper(variables, 
+                            node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
                 } else if (name.equals("*")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
+                    return toDoubleHelper(variables, 
+                            node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
                 } else if (name.equals("/")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0) ) / toDoubleHelper(variables, node.getChildren().get(1));
+                    return toDoubleHelper(variables, 
+                            node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(1));
                 } else if (name.equals("^")) {
-                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1)));
+                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
+                            toDoubleHelper(variables, node.getChildren().get(1)));
                 } else {
                     throw new EvaluationError("Unknown Operation");
                 }
@@ -123,7 +126,7 @@ public class ExpressionManipulators {
         // Hint 2: When you're implementing constant folding, you may want
         //         to call your "handleToDouble" method in some way
 
-        // TODO: Your code here
+
         return handleSimplifyHelper(env, env.getVariables(), node.getChildren().get(0));
     }
     
@@ -188,7 +191,7 @@ public class ExpressionManipulators {
     public static AstNode plot(Environment env, AstNode node) {
         IDictionary<String, AstNode> variables = env.getVariables();
         String variable = node.getChildren().get(1).getName();
-        if(variables.containsKey(variable)) {
+        if (variables.containsKey(variable)) {
             throw new EvaluationError("'var' was already defined");
         }
         double xMin = toDoubleHelper(variables, node.getChildren().get(2));
@@ -205,7 +208,7 @@ public class ExpressionManipulators {
         IList<Double> yList = new DoubleLinkedList<Double>();
        
         IDictionary<String, AstNode> xVars = new ArrayDictionary<String, AstNode>();
-        for(double i = xMin; i <= xMax; i+= interval) {
+        for (double i = xMin; i <= xMax; i+= interval) {
             xVars.put(variable, new AstNode(i));
             xList.add(i);
             yList.add(toDoubleHelper(xVars, function));
