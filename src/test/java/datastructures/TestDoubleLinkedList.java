@@ -70,38 +70,36 @@ public class TestDoubleLinkedList extends BaseTest {
     
     @Test(timeout=SECOND)
     public void testDelete() {
-        DoubleLinkedList<String> list = (DoubleLinkedList<String>) makeBasicList();
+        IList<String> list = makeBasicList();
         String a = list.delete(0);
         assertEquals(a, "a");
         assertListMatches(new String[] {"b", "c"}, list);
-        assertEquals(list.getFront(), "b");
-        assertEquals(list.getBack(), "c");
+        assertEquals(list.get(0), "b");
+        assertEquals(list.get(1), "c");
         
         String b = list.delete(0);
         assertEquals(b, "b");
         assertListMatches(new String[] {"c"}, list);
-        assertEquals(list.getFront(), "c");
-        assertEquals(list.getBack(), "c");
+        assertEquals(list.get(0), "c");
         
         String c = list.delete(0);
         assertEquals(c, "c");
         assertListMatches(new String[] {}, list);
-        assertEquals(list.getFront(), null);
-        assertEquals(list.getBack(), null);
+        assertEquals(list.get(0), null);
         
-        DoubleLinkedList<String> list2 = (DoubleLinkedList<String>) makeBasicList();
+        IList<String> list2 = makeBasicList();
         String b2 = list2.delete(1);
         assertEquals(b2, "b");
         assertListMatches(new String[] {"a", "c"}, list2);
-        assertEquals(list2.getFront(), "a");
-        assertEquals(list2.getBack(), "c");
+        assertEquals(list2.get(0), "a");
+        assertEquals(list2.get(1), "c");
         
-        DoubleLinkedList<String> list3 = (DoubleLinkedList<String>) makeBasicList();
+        IList<String> list3 = makeBasicList();
         String c2 = list3.delete(2);
         assertEquals(c2, "c");
         assertListMatches(new String[] {"a", "b"}, list3);
-        assertEquals(list3.getFront(), "a");
-        assertEquals(list3.getBack(), "b");
+        assertEquals(list3.get(0), "a");
+        assertEquals(list3.get(1), "b");
     }
     
     @Test
