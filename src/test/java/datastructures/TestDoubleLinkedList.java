@@ -85,7 +85,6 @@ public class TestDoubleLinkedList extends BaseTest {
         String c = list.delete(0);
         assertEquals(c, "c");
         assertListMatches(new String[] {}, list);
-        assertEquals(list.get(0), null);
         
         IList<String> list2 = makeBasicList();
         String b2 = list2.delete(1);
